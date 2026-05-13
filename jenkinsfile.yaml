@@ -1,0 +1,34 @@
+pipeline{
+     agent any
+
+     envoirnment {
+        IMAGE_NAME = "myapp"
+        }
+       stages {
+          stage('Checkout'){
+             steps {
+                 git branch: 'main',
+                 url: 'https://github.com/project/repo.git'
+             }
+          }
+           stage('Build'){
+             steps {
+               sh 'mvn clean package'
+             }
+           stage('SonarQube Scan'){
+             steps {
+               sh 'mvn soanr:sonar'
+             }
+          }
+          stage('Docker Build'){
+             steps {
+               sh 'docker build -t $IMAGE_NAME .'
+             }
+           }
+         stage('Deploy'){
+             steps {
+               sh 'kubectl apply if deployment.yaml'
+             }
+           } 
+       }
+   }
